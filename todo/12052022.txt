@@ -1,0 +1,39 @@
+responsabil autorizare variatii
+camp cant initiala (deviz)
+adaugare deviz (open proj): 
+1. btn deschide schema, creaza circuitul
+2. preia circuitul (circuitele) nou in variatii
+3. creaza devize pt ele
+
+email prezentare/training cristina si cosmin OK
+
+
+UNTRR todos:
+1. rezolva eroarea soap:Receiverorg.asktirweb.services.tirhaulierservice_1.ServiceException: Invalid UTF-8 start byte 0x8b (at char #2, byte #-1) OK
+2. inregistraza "lastModificationDate" si "id" din raspunsurile createVehicle si conditioneaza recreerea aceluiasi vehicul
+3. inregistraza factura din filiala
+4. refa testele
+5. log dialoguri haulier, vehicul
+6. verifica trimiterea adresei
+
+cantitate deviz OK
+fill list "lucrare" OK
+filtre OK
+consumator, sursa OK
+geografie + sf
+activitati
+paginare pentru proiecte mari
+
+---------------
+adaugare activitati selectate din "Linii FL" eroare de sintaxa OK
+canitatile din "Variatie" deja introduse, la deschiderea si inchiderea popup FL se "pierd" = 0 OK
+-decizie externa, cant negativa => nrcsel 4076 cu fprms=4074 OK
+-NR nu scade din FL, precum AFLMin OK
+-Variatii FL: in linii bifa "generat" si astfel nu vor mai fi generate ulterior documente; va fi bifat la retur id de la salvare DBPost(); daca validat. Daca doc generat este sters se debifeaza pt a fi generat din nou. Coloana noua langa generat cu denumirea doc generat. daca generat = true => nu poti sterge linia. OK
+-trece pe live ce ai modificat prin comparatie (merge) (alf electric, fl electric) OK
+-daca doc variatii a fost salvat, campurile "factori decizie" nu mai pot fi modificate OK
+-variatii fl, verifica populare cant FL in timp real
+-a nu se varia mai mult decat exista in FL (min 0 consum) OK
+------------------------------------------------------------------------------
+PET Factory:
+-ABC: update dimensiune departament la vanzari (sosource=1351) >>>>>>> depart = vanzari

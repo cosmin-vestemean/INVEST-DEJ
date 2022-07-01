@@ -1,0 +1,5 @@
+-rapoartele <= obiect, ca la ABC
+-master-details-details
+-materiale marunt out
+-pe struct. de doc variatii + nou pe variatii inhibat
+-PUNE NI LOC DE TEXT FINDOC IN DOC GENERAT

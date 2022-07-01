@@ -1,0 +1,18 @@
+variatii fl:
+-filtru linii doar surse/circuite/etc (activitati); -fii consecvent in filtrele astea pe tot fluxul (deviz, afl, rzl) <=> set field ed centralizat
+-selector circuit si consumator cu apartenenta evidentiata. Atentie la consumaor ,+ db view ca nu are circuit
+
+--circuit nou:
+conventii:
+1. sursa, circuitul si consumatorii se realizeza in schema electrica si se vor adauga in linie variatii
+
+-a se aduce geo si sf din linie circuit schema electrica la alegerea consumatorului in variatii fl
+
+-creare deviz din variatii pe surse/circuite/consumator care nu exista in fl
+-generarea unui deviz din variatii trebuie sa mentioneze proveninta in fl (VFLEL00023)
+
+-deschidere deviz eroare cccconsumator?!?
+-inlocuire generic cu stocabil: si in variatii FL
+
+
+VEZI CE ESTE CU REPOSITORY GIT HUB INVEST, E VARZA

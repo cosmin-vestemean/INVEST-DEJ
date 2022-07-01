@@ -1,0 +1,2 @@
+//// SaldocJS
+lib.include('JSCommon');
