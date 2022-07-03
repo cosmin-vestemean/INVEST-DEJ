@@ -1,2 +1,0 @@
-//// SaldocJS
-lib.include('JSCommon');

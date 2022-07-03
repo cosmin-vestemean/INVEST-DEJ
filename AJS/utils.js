@@ -274,31 +274,52 @@ function getFLQtyFor(mtrl, attributes, dsFL) {
 
 //call it ON_CREATE, for example: setFldEdOnConsumator('ITELINES.CCCMTRLGEN', ':SALDOC.CCCHEADER', ':ITELINES.CCCTABLOURI', ':ITELINES.CCCCIRCUIT');
 function setEditorsOnElectricalFields(schEl, fldSursa, fldCircuit, fldConsumator, sursa, circuit) {
-    setFldEdOnSursa(fldSursa, schEl);
-    setFldEdOnCircuit(fldCircuit, schEl, sursa);
-    setFldEdOnConsumator(fldConsumator, schEl, sursa, circuit);
+    var editor = 'CCCTABLOURI(W[A.CCCHEADER=' + schEl + '])';
+    X.SETFIELDEDITOR(fldSursa, editor);
 
-    function setFldEdOnConsumator(filedName, schEl, sursa, circuit) {
-        var editor = 'CCCCONSUMATORITEMV(W[A.CCCHEADER=' + schEl + ' ' +
-            'AND A.CCCMTRLGEN IN (SELECT CC.CCCMTRLGEN FROM ' +
-            'CCCCONSUMATOR CC INNER JOIN CCCLINIICIRCUIT AA ON (CC.CCCCONSUMATOR=AA.CCCCONSUMATOR) ' +
-            'INNER JOIN CCCCIRCUIT BB ON (AA.CCCCIRCUIT=BB.CCCCIRCUIT) ' +
-            'WHERE AA.CCCHEADER=' + schEl + ' ' +
-            'AND BB.CCCTABLOU=' + sursa + ' ' +
-            'AND AA.CCCCIRCUIT=' + circuit + ')])';
-        X.SETFIELDEDITOR(filedName, editor);
-    }
+    editor = 'CCCCIRCUIT(W[CCCHEADER=' + schEl + ' AND CCCTABLOU=' + sursa + '])';
+    X.SETFIELDEDITOR(fldCircuit, editor);
+    editor = 'CCCCONSUMATORITEMV(W[A.CCCHEADER=' + schEl + ' ' +
+        'AND A.CCCMTRLGEN IN (SELECT CC.CCCMTRLGEN FROM ' +
+        'CCCCONSUMATOR CC INNER JOIN CCCLINIICIRCUIT AA ON (CC.CCCCONSUMATOR=AA.CCCCONSUMATOR) ' +
+        'INNER JOIN CCCCIRCUIT BB ON (AA.CCCCIRCUIT=BB.CCCCIRCUIT) ' +
+        'WHERE AA.CCCHEADER=' + schEl + ' ' +
+        'AND BB.CCCTABLOU=' + sursa + ' ' +
+        'AND AA.CCCCIRCUIT=' + circuit + ')])';
+    X.SETFIELDEDITOR(fldConsumator, editor);
+}
 
-    //same code like setFldEdOnConsumator for CCCTABLOURI
-    function setFldEdOnSursa(filedName, schEl) {
-        var editor = 'CCCTABLOURI(W[A.CCCHEADER=' + schEl + '])';
-        X.SETFIELDEDITOR(filedName, editor);
-    }
+function setEditorOnActivitateFields(fldSpecializare, fldColectie, fldCapitol, fldGrupaLucrari, fldActivitate, specializare, colectie, capitol, grupalucrari) {
+    var editor = 'CCCSPECIALIZARE';
+    X.SETFIELDEDITOR(fldSpecializare, editor);
+    editor = 'CCCCOLECTIE(W[CCCSPECIALIZARE=' + specializare + ' AND CCCCOLECTIE IN (SELECT DISTINCT CCCCOLECTIE FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    X.SETFIELDEDITOR(fldColectie, editor);
+    editor = 'CCCCAPITOL(W[CCCCOLECTIE=' + colectie + ' AND CCCCAPITOL IN (SELECT DISTINCT CCCCAPITOL FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    X.SETFIELDEDITOR(fldCapitol, editor);
+    editor = 'CCCGRUPALUCRARI(W[CCCCAPITOL = ' + capitol + ' AND CCCGRUPALUCRARI IN (SELECT DISTINCT CCCGRUPALUCRARI FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    X.SETFIELDEDITOR(fldGrupaLucrari, editor);
+    editor = 'CCCACTIVITATE(W[CCCGRUPALUCRARI = ' + grupalucrari + ' AND CCCACTIVITATE IN (SELECT DISTINCT CCCACTIVITATE FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    X.SETFIELDEDITOR(fldActivitate, editor);
+}
 
-    function setFldEdOnCircuit(filedName, schEl, sursa) {
-        var editor = 'CCCCIRCUIT(W[CCCHEADER=' + schEl + ' AND CCCTABLOU=' + sursa + '])';
-        X.SETFIELDEDITOR(filedName, editor);
-    }
+function setEditorOnFunctionalFields(fldSpecialitateSF, fldSF, fldColectieSF, specialitateSF, SF) {
+    var editor = 'CCCSPECIALITATESF';
+    X.SETFIELDEDITOR(fldSpecialitateSF, editor);
+    editor = 'CCCSF(W[A.CCCSPECIALITATESF=' + specialitateSF + '])';
+    X.SETFIELDEDITOR(fldSF, editor);
+    editor = 'CCCCOLECTIESF(W[A.CCCSF=' + SF + '])';
+    X.SETFIELDEDITOR(fldColectieSF, editor);
+}
+
+function setEditorOnGeographicalFields(schEl, fldCladire, fldPrimaryspace, fldSecondarySpace, fldIncapere, cladire, primaryspace, secondaryspace) {
+    var editor = 'CCCCLADIRE(W[A.CCCHEADER=' + schEl + '])';
+    X.SETFIELDEDITOR(fldCladire, editor);
+    editor = 'CCCPRIMARYSPACE(W[A.CCCHEADER=' + schEl + ' AND CCCCLADIRE=' + cladire + '])';
+    X.SETFIELDEDITOR(fldPrimaryspace, editor);
+    editor = 'CCCSECONDARYSPACE(W[A.CCCHEADER=' + schEl + ' AND CCCPRIMARYSPACE=' + primaryspace + '])';
+    X.SETFIELDEDITOR(fldSecondarySpace, editor);
+    editor = 'CCCINCAPERE(W[A.CCCHEADER=' + schEl + ' AND CCCSECONDARYSPACE=' + secondaryspace + '])';
+    X.SETFIELDEDITOR(fldIncapere, editor);
 }
 
 //var enumLinii = getSelectedFromGrid('dsConsumatori', 'CCCLINIICIRCUIT');
