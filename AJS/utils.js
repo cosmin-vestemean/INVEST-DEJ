@@ -289,16 +289,16 @@ function setEditorsOnElectricalFields(schEl, fldSursa, fldCircuit, fldConsumator
     X.SETFIELDEDITOR(fldConsumator, editor);
 }
 
-function setEditorOnActivitateFields(fldSpecializare, fldColectie, fldCapitol, fldGrupaLucrari, fldActivitate, specializare, colectie, capitol, grupalucrari) {
+function setEditorOnActivitateFields(prjc, fldSpecializare, fldColectie, fldCapitol, fldGrupaLucrari, fldActivitate, specializare, colectie, capitol, grupalucrari) {
     var editor = 'CCCSPECIALIZARE';
     X.SETFIELDEDITOR(fldSpecializare, editor);
-    editor = 'CCCCOLECTIE(W[CCCSPECIALIZARE=' + specializare + ' AND CCCCOLECTIE IN (SELECT DISTINCT CCCCOLECTIE FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    editor = 'CCCCOLECTIE(W[CCCSPECIALIZARE=' + specializare + ' AND CCCCOLECTIE IN (SELECT DISTINCT CCCCOLECTIE FROM CCCACTIVITATEPRJC WHERE PRJC = ' + prjc + ')])';
     X.SETFIELDEDITOR(fldColectie, editor);
-    editor = 'CCCCAPITOL(W[CCCCOLECTIE=' + colectie + ' AND CCCCAPITOL IN (SELECT DISTINCT CCCCAPITOL FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    editor = 'CCCCAPITOL(W[CCCCOLECTIE=' + colectie + ' AND CCCCAPITOL IN (SELECT DISTINCT CCCCAPITOL FROM CCCACTIVITATEPRJC WHERE PRJC = ' + prjc + ')])';
     X.SETFIELDEDITOR(fldCapitol, editor);
-    editor = 'CCCGRUPALUCRARI(W[CCCCAPITOL = ' + capitol + ' AND CCCGRUPALUCRARI IN (SELECT DISTINCT CCCGRUPALUCRARI FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    editor = 'CCCGRUPALUCRARI(W[CCCCAPITOL = ' + capitol + ' AND CCCGRUPALUCRARI IN (SELECT DISTINCT CCCGRUPALUCRARI FROM CCCACTIVITATEPRJC WHERE PRJC = ' + prjc + ')])';
     X.SETFIELDEDITOR(fldGrupaLucrari, editor);
-    editor = 'CCCACTIVITATE(W[CCCGRUPALUCRARI = ' + grupalucrari + ' AND CCCACTIVITATE IN (SELECT DISTINCT CCCACTIVITATE FROM CCCACTIVITATEPRJC WHERE PRJC = :SALDOC.PRJC)])';
+    editor = 'CCCACTIVITATE(W[CCCGRUPALUCRARI = ' + grupalucrari + ' AND CCCACTIVITATE IN (SELECT DISTINCT CCCACTIVITATE FROM CCCACTIVITATEPRJC WHERE PRJC = ' + prjc + ')])';
     X.SETFIELDEDITOR(fldActivitate, editor);
 }
 
