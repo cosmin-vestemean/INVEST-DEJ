@@ -1380,7 +1380,7 @@ function getDocsWithArtGen(artGen) {
 		'from findoc f ' +
 		'inner join mtrlines ml on (f.findoc=ml.findoc and f.sosource=ml.sosource and f.company=ml.company and ml.mtrl=' + artGen + ')' +
 		//'where f.sosource=1351 and f.series in (4067) ' +
-		'where f.sosource=1351 and f.series in (4067, 4068) ' +
+		'where f.sosource=1351 and f.series in (4067, 4068, 4073) ' +
 		'and isnull(f.iscancel, 0) = 0 and f.cccheader=' + CCCHEADER.CCCHEADER, null);
 }
 
