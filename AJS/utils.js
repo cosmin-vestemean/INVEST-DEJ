@@ -331,8 +331,9 @@ function getSelectedFromGrid(gridName, returnedField) {
 
 //[{sursa: 1332, circuit: 132254}]
 function circuitsExistsInFl(schEl, fl, sursaCircuitArrOfObj) {
-    var q = 'select distinct a.ccctablouri, a.ccccircuit from mtrlines a ' +
+    var q = 'select distinct a.ccctablouri, a.ccccircuit, c.deviz from mtrlines a ' +
         'inner join findoc b on (a.findoc=b.findoc) ' +
+        'left join ccccircuit c on (c.ccccircuit=a.ccccircuit) ' +
         'where b.findoc=' + fl;
 
     var ds = X.GETSQLDATASET(q, null);
@@ -347,6 +348,7 @@ function circuitsExistsInFl(schEl, fl, sursaCircuitArrOfObj) {
             } else {
                 ret[ret.length - 1].exists = false;
             }
+            ret[ret.length - 1].deviz = ds.deviz;
         }
     }
 
