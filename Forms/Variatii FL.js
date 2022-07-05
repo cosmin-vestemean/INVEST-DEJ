@@ -388,7 +388,7 @@ function EXECCOMMAND(cmd) {
                         }], true); //desi ar fi de preferat sa scot lista o singura data (isFirst), prefer sa o cer de fiecare data,
                         //ca sa prind noul (anterior) posibil deviz creat
                         if (lst.length > 0 && !lst[0].exists || (lst.length > 0 && lst[0].exists && !lst[0].deviz)) {
-                            debugger;
+                            //debugger;
                             //createDocVariatii(ITELINES, SRVLINES, 4068, sursa, circuit);
                             newFindoc = creazaDocVariatii(SALDOC, 4068, 'SALDOC[Form=Deviz electric]', SALDOC.PRJC, SALDOC.CCCHEADER, SALDOC.CCCFLMR, sursa, circuit, ITELINES, SRVLINES);
                         }
