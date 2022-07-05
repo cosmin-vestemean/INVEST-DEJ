@@ -1,4 +1,4 @@
-var dsFL;
+var dsFL, sursaCircuitList;
 
 //at some point call like this:
 /*
@@ -330,26 +330,31 @@ function getSelectedFromGrid(gridName, returnedField) {
 }
 
 //[{sursa: 1332, circuit: 132254}]
-function circuitsExistsInFl(schEl, fl, sursaCircuitArrOfObj) {
-    var q = 'select distinct a.ccctablouri, a.ccccircuit, c.deviz from mtrlines a ' +
-        'inner join findoc b on (a.findoc=b.findoc) ' +
-        'left join ccccircuit c on (c.ccccircuit=a.ccccircuit) ' +
-        'where b.findoc=' + fl;
-
-    var ds = X.GETSQLDATASET(q, null);
+function circuitsExistsInFl(schEl, fl, sursaCircuitArrOfObj, refreshList) {
+    if (refreshList)
+        sursaCircuitList = getSursaCircuitList(fl);
     var ret = [];
 
-    if (ds.RECORDCOUNT) {
+    if (sursaCircuitList.RECORDCOUNT) {
         for (var i = 0; i < sursaCircuitArrOfObj.length; i++) {
             ret.push(sursaCircuitArrOfObj[i]);
             ret[ret.length - 1].schema = schEl;
-            if (ds.LOCATE('CCCTABLOURI;CCCCIRCUIT', sursaCircuitArrOfObj[i].sursa, sursaCircuitArrOfObj[i].circuit)) {
+            if (sursaCircuitList.LOCATE('CCCTABLOURI;CCCCIRCUIT', sursaCircuitArrOfObj[i].sursa, sursaCircuitArrOfObj[i].circuit)) {
                 ret[ret.length - 1].exists = true;
             } else {
                 ret[ret.length - 1].exists = false;
             }
-            ret[ret.length - 1].deviz = ds.deviz;
+            ret[ret.length - 1].deviz = sursaCircuitList.deviz;
         }
+    }
+
+    function getSursaCircuitList(fl) {
+        var q = 'select distinct a.ccctablouri, a.ccccircuit, c.deviz from mtrlines a ' +
+            'inner join findoc b on (a.findoc=b.findoc) ' +
+            'left join ccccircuit c on (c.ccccircuit=a.ccccircuit) ' +
+            'where b.findoc=' + fl;
+
+        return X.GETSQLDATASET(q, null);
     }
 
     return ret;
@@ -402,7 +407,9 @@ function creazaDocVariatii(obj, series, strObj, prjc, schEl, fl, sursa, circuit,
 
         var l = d.FindTable('ITELINES'),
             srv = d.FindTable('SRVLINES'),
-            i, j, id;
+            i = 0,
+            j = 0,
+            id = 0;
         if (liniiIteCircuit.RECORDCOUNT) {
             i = loadLines(l, liniiIteCircuit, false);
         }
@@ -412,19 +419,20 @@ function creazaDocVariatii(obj, series, strObj, prjc, schEl, fl, sursa, circuit,
 
         if (i || j) {
             id = d.SHOWOBJFORM();
-            if (id) {
+            if (id > 0) {
                 dispose(d);
                 //marcare in ds proveninenta ca fiind linie convertita (pentru generari secventiale), in variatii FL; in schema electrica nu are sens
                 var doc = X.SQL('select fincode from findoc where findoc=' + id, null);
-                if (i) markSource(liniiIteCircuit, id, doc);
-                if (j) markSource(liniiSrvCircuit, id, doc);
+                if (i) markSource(liniiIteCircuit, 1, id, doc);
+                if (j) markSource(liniiSrvCircuit, 1, id, doc);
                 return id;
             } else {
                 dispose(d);
+                debugger;
                 X.WARNING('Ati optat sa nu salvati documentul propus.');
                 //demarcare in ds proveninenta ca fiind linie convertita (pentru generari secventiale), in variatii FL; in schema electrica nu are sens
-                if (i) markSource(liniiIteCircuit, null, '');
-                if (j) markSource(liniiSrvCircuit, null, '');
+                if (i) markSource(liniiIteCircuit, 0, null, '');
+                if (j) markSource(liniiSrvCircuit, 0, null, '');
                 return 0;
             }
         } else {
@@ -502,18 +510,18 @@ function creazaDocVariatii(obj, series, strObj, prjc, schEl, fl, sursa, circuit,
             if (src.FINDOC)
                 dest.FINDOCS = src.FINDOC;
             //marcare in ds destinatie ca fiind linie rezultata din acest proces de conversie (creare doc variatii)
-            dest.BOOL02 = 1;
+            dest.CCCQTYNR = 1;
         }
 
         return dest.RECORDCOUNT;
     }
 
-    function markSource(ds, id, doc) {
+    function markSource(ds, mark, id, doc) {
         if (ds.RECORDCOUNT) {
             ds.FIRST;
-            if (ds.CCCQTYNR && ds.CCCBULLSHIT1) {
+            if (ds.CCCQTYNR !== 'undefined' && ds.CCCBULLSHIT1 !== 'undefined' && ds.CCCINT01 !== 'undefined') {
                 while (!ds.EOF) {
-                    ds.CCCQTYNR = 1;
+                    ds.CCCQTYNR = mark;
                     ds.CCCINT01 = id;
                     ds.CCCBULLSHIT1 = doc;
                     ds.NEXT;
@@ -526,6 +534,15 @@ function creazaDocVariatii(obj, series, strObj, prjc, schEl, fl, sursa, circuit,
 function dispose(obj) {
     obj.FREE;
     obj = null;
+}
+
+function getDetailsForGeneric(schEl, sursa, circuit, mtrlGen) {
+    var q = 'SELECT CC.CCCMTRLGEN, BB.* FROM CCCLINIICIRCUIT BB ' +
+        'INNER JOIN CCCCIRCUIT AA ON (AA.CCCCIRCUIT=BB.CCCCIRCUIT) ' +
+        'INNER JOIN CCCCONSUMATOR CC ON (BB.CCCCONSUMATOR=CC.CCCCONSUMATOR) ' +
+        'WHERE AA.CCCHEADER=' + schEl + ' AND AA.CCCTABLOU=' + sursa + ' AND AA.CCCCIRCUIT=' + circuit + ' AND CC.CCCMTRLGEN=' + mtrlGen;
+
+    return X.GETSQLDATASET(q, null);
 }
 
 //test git

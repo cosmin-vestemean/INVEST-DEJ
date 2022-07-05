@@ -1,6 +1,7 @@
 lib.include('utils');
 
-var vedeta = {}, whichTab = 0;
+var vedeta = {},
+    whichTab = 0;
 
 function ON_POST() {
     //interdictie de stare anulat daca documentul a fost deja convertit
@@ -80,9 +81,9 @@ function ON_POST() {
     ITELINES.FIRST;
     var afterMsg = '';
     while (!ITELINES.EOF) {
-        if (ITELINES.COMMENTS2 && SALDOC.CCCHEADER /* && ITELINES.MTRL == 13499*/) {
+        if (ITELINES.COMMENTS2 && SALDOC.CCCHEADER /* && ITELINES.MTRL == 13499*/ ) {
             //debugger;
-            var existingMTRL = X.SQL("select isnull(mtrl, 0) from mtrl where cccheader = " + SALDOC.CCCHEADER + " and name='" + ITELINES.COMMENTS2.trim()  + " (M.G.I.)'", null);
+            var existingMTRL = X.SQL("select isnull(mtrl, 0) from mtrl where cccheader = " + SALDOC.CCCHEADER + " and name='" + ITELINES.COMMENTS2.trim() + " (M.G.I.)'", null);
             var q = ITELINES.QTY1;
             if (!existingMTRL) {
                 var mtrl = creazaArtGen(ITELINES.COMMENTS2);
@@ -91,8 +92,8 @@ function ON_POST() {
 
             } else {
                 //inlocuieste-l cu cel din baza de date, existent
-				//ITELINES.MTRL = existingMTRL;	
-				X.EXCEPTION(ITELINES.COMMENTS2.trim() + ': Un articol cu aceasta denumire deja exista.\nVa rog sa il folositi.');
+                //ITELINES.MTRL = existingMTRL;	
+                X.EXCEPTION(ITELINES.COMMENTS2.trim() + ': Un articol cu aceasta denumire deja exista.\nVa rog sa il folositi.');
             }
             ITELINES.QTY1 = q;
             ITELINES.COMMENTS = ITELINES.COMMENTS2;
@@ -228,11 +229,20 @@ function ON_SALDOC_SERIES() {
 
 function ON_DELETE() {
     unlinkDev();
+
+    //loop thru lines and update ITELINES.CCCQTYNR = 0 WHERE  FINDOCS, MTRLINESS
+    markLinesVarFL(ITELINES);
+
+    //SRVLINES also
+    markLinesVarFL(SRVLINES);
 }
 
 function ON_SALDOC_ISCANCEL() {
-    if (SALDOC.ISCANCEL)
+    if (SALDOC.ISCANCEL) {
         unlinkDev();
+        markLinesVarFL(ITELINES);
+        markLinesVarFL(SRVLINES);
+    }
 }
 
 function unlinkDev() {
@@ -248,8 +258,7 @@ function unlinkDev() {
         o.DBPost;
     } catch (e) {
         X.WARNING(e.message);
-    }
-    finally {
+    } finally {
         o.FREE;
         o = null;
     }
@@ -490,8 +499,7 @@ function ON_SFDEVIZE_ACCEPT() {
 
                 } catch (err) {
                     X.WARNING(err.message);
-                }
-                finally {
+                } finally {
                     d.FREE;
                 }
             }
@@ -656,8 +664,7 @@ function updateFL(iteDs, srvDs) {
                 }
             } catch (e) {
                 X.WARNING(e.message);
-            }
-            finally {
+            } finally {
                 ObjFL.FREE;
                 ObjFL = null;
 
@@ -986,16 +993,14 @@ function creazaArtGen(nume) {
                 o1.DBPost;
             } catch (e) {
                 X.WARNING(e.message);
-            }
-            finally {
+            } finally {
                 o1.FREE;
                 o1 = null;
             }
         }
     } catch (e) {
         X.WARNING(e.message);
-    }
-    finally {
+    } finally {
         o.FREE;
         o = null;
         return mtrl;
@@ -1143,11 +1148,11 @@ function ON_SRVLINES_CCCMTRLGEN() {
 
 function apartineCircuitului(ds) {
     if (X.SQL('select case when ' + ds.CCCMTRLGEN + ' not in (' +
-        'SELECT DISTINCT bb.cccmtrlgen ' +
-        'FROM cccliniicircuit aa ' +
-        'inner join cccconsumator bb on (aa.cccconsumator=bb.cccconsumator) ' +
-        'WHERE aa.ccccircuit = ' + SALDOC.INT01 + ')' +
-        ' then 1 else 0 end', null) == 1) {
+            'SELECT DISTINCT bb.cccmtrlgen ' +
+            'FROM cccliniicircuit aa ' +
+            'inner join cccconsumator bb on (aa.cccconsumator=bb.cccconsumator) ' +
+            'WHERE aa.ccccircuit = ' + SALDOC.INT01 + ')' +
+            ' then 1 else 0 end', null) == 1) {
         X.WARNING('Consumatorul selectat nu apartine circuitului ' + SALDOC.INT01_CCCCIRCUIT_DENUMIRE);
         ds.DELETE;
         return false;
@@ -1298,8 +1303,31 @@ function esteConvertit(findoc) {
         return false;
 }
 
-function ON_ITELINES_QTY1 () {
-	if (ITELINES.QTY1 && ITELINES.QTY1 != ITELINES.CCCANULAT) {
-		ITELINES.CCCANULAT = ITELINES.QTY1;
-	}
+function ON_ITELINES_QTY1() {
+    if (ITELINES.QTY1 && ITELINES.QTY1 != ITELINES.CCCANULAT) {
+        ITELINES.CCCANULAT = ITELINES.QTY1;
+    }
+}
+
+function markLinesVarFL(ds) {
+    ds.FIRST;
+    while (!ds.EOF) {
+        markLineVarFL(ds);
+        ds.NEXT;
+    }
+}
+
+function ON_ITELINES_BEFOREDELETE() {
+    markLineVarFL(ITELINES);
+}
+
+function ON_SRVLINES_BEFOREDELETE() {
+    markLineVarFL(SRVLINES);
+}
+
+function markLineVarFL(ds) {
+    if (ds.CCCQTYNR && ds.FINDOCS && ds.MTRLINESS) {
+        var q = 'UPDATE MTRLINES SET CCCQTYNR = 0, CCCINT01 = NULL, CCCBULLSHIT1 = NULL WHERE FINDOC = ' + ds.FINDOCS + ' AND MTRLINES = ' + ds.MTRLINESS;
+        X.RUNSQL(q, null);
+    }
 }

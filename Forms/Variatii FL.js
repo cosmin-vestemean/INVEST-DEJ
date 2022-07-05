@@ -346,9 +346,10 @@ function EXECCOMMAND(cmd) {
             return;
         }
 
-        var dsUnic = X.GETSQLDATASET('select distinct ccctablouri, ccccircuit from mtrlines where findoc=' + SALDOC.FINDOC, null);
+        var dsUnic = X.GETSQLDATASET('select distinct ccctablouri, ccccircuit from mtrlines where findoc=' + SALDOC.FINDOC +
+            ' and isnull(CCCQTYNR, 0) = 0', null);
         if (!dsUnic.RECORDCOUNT) {
-            X.WARNING('Internal err. "select distinct ccctablouri, ccccircuit" returns null.');
+            X.WARNING('Nu am ce genera.');
             return;
         } else {
             dsUnic.FIRST;
@@ -372,6 +373,24 @@ function EXECCOMMAND(cmd) {
                         } else {
                             filtruIte += ' AND {ITELINES.CCCCIRCUIT}=' + circuit;
                             filtruSrv += ' AND {SRVLINES.CCCCIRCUIT}=' + circuit;
+                        }
+                    }
+
+                    //deviz (nu exista in fl)
+                    //daca {sursa;circuit} nu exista in fl, creaza deviz
+                    //daca {sursa;circuit} exista in fl, dar nu are deviz, creaza deviz
+                    filterDs(ITELINES, '(' + filtruIte + postIte + ')');
+                    filterDs(SRVLINES, '(' + filtruSrv + postSrv + ')');
+                    if (sursa && circuit) {
+                        var lst = circuitsExistsInFl(SALDOC.CCCHEADER, SALDOC.CCCFLMR, [{
+                            sursa: sursa,
+                            circuit: circuit
+                        }], true); //desi ar fi de preferat sa scot lista o singura data (isFirst), prefer sa o cer de fiecare data,
+                        //ca sa prind noul (anterior) posibil deviz creat
+                        if (lst.length > 0 && !lst[0].exists || (lst.length > 0 && lst[0].exists && !lst[0].deviz)) {
+                            debugger;
+                            //createDocVariatii(ITELINES, SRVLINES, 4068, sursa, circuit);
+                            newFindoc = creazaDocVariatii(SALDOC, 4068, 'SALDOC[Form=Deviz electric]', SALDOC.PRJC, SALDOC.CCCHEADER, SALDOC.CCCFLMR, sursa, circuit, ITELINES, SRVLINES);
                         }
                     }
 
@@ -475,6 +494,7 @@ function EXECCOMMAND(cmd) {
                 SRVLINES.FILTER = '';
                 ITELINES.FILTERED = 0;
                 SRVLINES.FILTERED = 0;
+                X.EXEC('button:save');
                 X.PROCESSMESSAGES;
                 dsUnic.NEXT;
             }
@@ -946,4 +966,31 @@ function ON_SRVLINES_BEFOREDELETE() {
 
 function ON_SRVLINES_NEW() {
     SRVLINES.MTRL = 13498;
+}
+
+function ON_ITELINES_CCCMTRLGEN() {
+    setDetails(ITELINES);
+}
+
+function ON_SRVLINES_CCCMTRLGEN() {
+    setDetails(SRVLINES);
+}
+
+function setDetails(ds) {
+    if (ds.CCCMTRLGEN && SALDOC.CCCHEADER && ds.CCCTABLOURI && ds.CCCCIRCUIT) {
+        var dsDetails = getDetailsForGeneric(SALDOC.CCCHEADER, ds.CCCTABLOURI, ds.CCCCIRCUIT, ds.CCCMTRLGEN);
+        if (dsDetails.RECORDCOUNT) {
+            dsDetails.FIRST;
+            while (!dsDetails.EOF) {
+                ds.CCCCLADIRE = dsDetails.CCCCLADIRE;
+                ds.CCCPRIMARYSPACE = dsDetails.CCCPRIMARYSPACE;
+                ds.CCCSECONDARYSPACE = dsDetails.CCCSECONDARYSPACE;
+                ds.CCCINCAPERE = dsDetails.CCCINCAPERE;
+                ds.CCCSPECIALITATESF = dsDetails.CCCSPECIALITATESF;
+                ds.CCCSF = dsDetails.CCCSF;
+                ds.CCCCOLECTIESF = dsDetails.CCCCOLECTIESF;
+                dsDetails.NEXT;
+            }
+        }
+    }
 }

@@ -979,7 +979,7 @@ function createDefaultGenerics() {
             }
         }
 		*/
-		X.WARNING('Creati AFL corespunzator pe flux!.');
+		X.WARNING('Creati AFL/Variatii FL corespunzator pe flux!.');
 
 		pasibileDeAFL.length = 0;
 	}
@@ -1327,7 +1327,7 @@ function ON_CCCCONSUMATOR_DENUMIRE() {
 
 function consumatorExistent(l, str) {
 	for (var i = 0; i < l.length; i++) {
-		if (l[i].denumire.toLowerCase().trim() == str.toLowerCase().trim()) {
+		if (l[i].denumire.toLowerCase().trim() == str.toLowerCase().trim() ) {
 			return true;
 		}
 	}

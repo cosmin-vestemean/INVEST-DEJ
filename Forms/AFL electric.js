@@ -519,11 +519,7 @@ function ON_SRVLINES_BEFOREDELETE() {
 
 function markLineVarFL(ds) {
     if (ds.CCCQTYNR && ds.FINDOCS && ds.MTRLINESS) {
-        var q = 'UPDATE MTRLINES SET CCCQTYNR = 0 WHERE FINDOC = ' + ds.FINDOCS + ' AND MTRLINES = ' + ds.MTRLINESS;
-        X.RUNSQL(q, null);
-        q = 'UPDATE MTRLINES SET CCCINT01 = NULL WHERE FINDOC = ' + ds.FINDOCS + ' AND MTRLINES = ' + ds.MTRLINESS;
-        X.RUNSQL(q, null);
-        q = 'UPDATE MTRLINES SET CCCBULLSHIT1 = NULL WHERE FINDOC = ' + ds.FINDOCS + ' AND MTRLINES = ' + ds.MTRLINESS;
+        var q = 'UPDATE MTRLINES SET CCCQTYNR = 0, CCCINT01 = NULL, CCCBULLSHIT1 = NULL WHERE FINDOC = ' + ds.FINDOCS + ' AND MTRLINES = ' + ds.MTRLINESS;
         X.RUNSQL(q, null);
     }
 }
