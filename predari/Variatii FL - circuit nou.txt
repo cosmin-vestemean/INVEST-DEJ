@@ -1,0 +1,11 @@
+Variatii FL
+
+1. editori linii care respecta relatiile intre entitati (conectica, geografie, sistem functional): automat la crearea ORICARUI document electric
+2. selector consumator: evidentiere proiect
+3. introducerea doc variatii in algoritmul de inlocuire a stocabilului in schema electrica
+4. adaugare detalii geografice si sistem functional cand se adauga consumator in linii
+5. creare deviz din variatii pe surse/circuite care nu exista in fl
+6. notificare in FL a doc de provenienta (deviz creat astfel)
+7. la stergere deviz se sterge legatura din variatii pentru a putea fi din nou creat
+8. devizul nou creat este atasat de schema electrica
+9. mecanism vizual de adaugare consumator sau circuit din schema electrica
