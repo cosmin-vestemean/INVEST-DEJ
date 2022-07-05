@@ -60,17 +60,21 @@ function ON_POST() {
     }
 
     //actualizare findocs cu oferta negociata din header
+    //poate veni din oferta negociata sau din doc variatii
+    //daca doc variatii atunci CCCQTYNR = 1
     if ((SALDOC.CCCOFERTADEVIZ)) {
         ITELINES.FIRST;
         while (!ITELINES.EOF()) {
-            ITELINES.FINDOCS = SALDOC.CCCOFERTADEVIZ;
+            if (!ITELINES.CCCQTYNR)
+                ITELINES.FINDOCS = SALDOC.CCCOFERTADEVIZ;
             ITELINES.NEXT;
         }
     } else {
         X.WARNING('Atentie! Lipsa oferta negociata pe proiectul selectat!');
         ITELINES.FIRST;
         while (!ITELINES.EOF()) {
-            ITELINES.FINDOCS = null;
+            if (!ITELINES.CCCQTYNR)
+                ITELINES.FINDOCS = null;
             ITELINES.NEXT;
         }
 
@@ -523,12 +527,12 @@ function updateFL_1(ds) {
         linum++;
         q += 'INSERT INTO MTRLINES (COMPANY, FINDOC, MTRLINES, LINENUM, SODTYPE, MTRL, SOSOURCE, VAT, FINDOCS, CCCMTRLGEN, QTY1,' +
             'PRJC,CCCSPECIALITATESF, CCCSF, CCCCOLECTIESF, CCCCLADIRE, CCCPRIMARYSPACE, CCCSECONDARYSPACE, CCCINCAPERE, CCCTABLOURI, CCCCIRCUIT,' +
-            'CCCSPECIALIZARE, CCCCOLECTIE,CCCCAPITOL, CCCGRUPALUCRARI, CCCACTIVITATE) VALUES (' +
+            'CCCSPECIALIZARE, CCCCOLECTIE,CCCCAPITOL, CCCGRUPALUCRARI, CCCACTIVITATE, CCCNCSMRS) VALUES (' +
             ds.COMPANY + ',' + SALDOC.CCCFLMR + ',' + mtrlin + ',' + linum + ',' + ds.SODTYPE + ',' + ds.MTRL + ',1351,' + ds.VAT + ',' + ds.FINDOC + ',' +
             ds.CCCMTRLGEN + ',' + ds.QTY1 + ',' +
             ds.PRJC + ',' + ds.CCCSPECIALITATESF + ',' + ds.CCCSF + ',' + ds.CCCCOLECTIESF + ',' + ds.CCCCLADIRE + ',' + ds.CCCPRIMARYSPACE + ',' +
             ds.CCCSECONDARYSPACE + ',' + ds.CCCINCAPERE + ',' + ds.CCCTABLOURI + ',' + ds.CCCCIRCUIT + ',' + ds.CCCSPECIALIZARE + ',' +
-            ds.CCCCOLECTIE + ',' + ds.CCCCAPITOL + ',' + ds.CCCGRUPALUCRARI + ',' + ds.CCCACTIVITATE + ');';
+            ds.CCCCOLECTIE + ',' + ds.CCCCAPITOL + ',' + ds.CCCGRUPALUCRARI + ',' + ds.CCCACTIVITATE + ',' + SALDOC.FINCODE +');';
         ds.NEXT;
     }
 

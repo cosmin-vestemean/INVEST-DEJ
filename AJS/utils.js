@@ -505,10 +505,10 @@ function creazaDocVariatii(obj, series, strObj, prjc, schEl, fl, sursa, circuit,
                 dest.CCCSECONDARYSPACE = src.CCCSECONDARYSPACE;
             if (dest.CCCINCAPERE)
                 dest.CCCINCAPERE = src.CCCINCAPERE;
-            if (src.MTRLINES)
-                dest.MTRLINESS = src.MTRLINES;
             if (src.FINDOC)
                 dest.FINDOCS = src.FINDOC;
+            if (src.MTRLINES)
+                dest.MTRLINESS = src.MTRLINES;
             //marcare in ds destinatie ca fiind linie rezultata din acest proces de conversie (creare doc variatii)
             dest.CCCQTYNR = 1;
         }
