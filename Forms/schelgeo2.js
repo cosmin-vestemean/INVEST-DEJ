@@ -2,13 +2,77 @@ lib.include('utils');
 
 function EXECCOMMAND(cmd) {
     if (cmd == '202206301') {
-        //adauga consumator(i) selectat din schema electrica
-        var enumLinii = getSelectedFromGrid('dsConsumatori', 'CCCLINIICIRCUIT');
-        var enumCircuite = getSelectedFromGrid('dgCircuite', 'CCCCIRCUIT');
-        var enumSurse = getSelectedFromGrid('dgSurse1', 'CCCTABLOU');
-        X.WARNING(enumSurse + '\n' + enumCircuite + '\n' + enumLinii);
+        var p = X.CreateObj('SALDOC;Variatii FL');
+        try {
+            p.DBLocate(CCCHEADER.CCCINTTEMPVALUE);
+            var materialLines = p.FindTable('ITELINES');
+            if (materialLines.RECORDCOUNT > 0) {
+                adaugaConsumatoriSelectati('dsConsumatori', 'CCCLINIICIRCUIT', materialLines);
+                p.DBPost;
+            }
+        } catch (e) {
+            X.WARNING(e.message);
+        } finally {
+            p.FREE;
+            p = null;
+        }
+        X.CLOSEFORM();
+    }
+
+    if (cmd == '202206302') {
+        var p = X.CreateObj('SALDOC');
+        try {
+            p.DBLocate(CCCHEADER.CCCINTTEMPVALUE);
+            var materialLines = p.FindTable('ITELINES');
+            if (materialLines.RECORDCOUNT > 0) {
+                adaugaCircuiteSelectate('dgCircuite', 'CCCCIRCUIT', materialLines);
+                p.DBPost;
+            }
+        } catch (e) {
+            X.WARNING(e.message);
+        } finally {
+            p.FREE;
+            p = null;
+        }
+        X.CLOSEFORM();
     }
 }
+
+/*
+Copilot, this is how to access the any object in Soft One enviroment.
+In this case the object is called SALDOC. bUT you can call any object in the enviroment. for example: PURDOC.
+The primary key for SALDOC and PURDOC is the same, FINDOC, so you can use the same function to access both objects.
+SALDOC means Sales Document, PURDOC means Purchase Document.
+These objects contains the following tables:
+FINDOC which is the header of the document.
+ITELINES which is the lines containing materials of the document.
+ITEM which is the materials.
+SRVLINES which is the lines containing services of the document.
+var record = SALDOC.FINDOC;
+var p = X.CreateObj('PURDOC');
+    * locate record in the object
+try {
+    p.DBLocate(record);
+        * now you can use the object
+        * for example: you can delete it
+    p.DBDelete;
+        * or you can update it
+    p.DBInsert; //Modifies the Object status to insert mode in order to accept data.
+        * or you can access the data, meaning tables, fields, etc.
+        var docHeader = p.FindTable('FINDOC');
+        var materialLines = p.GetFieldValue('ITELINES');
+        var serviceLines = p.GetFieldValue('SRVLINES');
+
+        * if you created or modified an object you should commit it
+        p.DBPost;
+} catch (e) {
+    X.WARNING(e.message);
+}
+finally {
+    p.FREE;
+    p = null;
+}
+*/
 
 function ON_LOCATE() {
     showAllButMarunt();

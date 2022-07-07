@@ -192,6 +192,27 @@ function EXECCOMMAND(cmd) {
 	if (cmd == 202008131) {
 		replaceMtrlGen();
 	}
+
+	if (cmd == 20220706) {
+		var query = 'delete from ccccircuit where ccccircuit in (select aa.ccccircuit from '+
+			'( '+
+			'select a.deviz, a.ccctablou, a.ccccircuit, a.denumire, b.cccliniicircuit '+
+			'from ccccircuit a '+
+			'left join cccliniicircuit b on (a.ccccircuit=b.ccccircuit and a.cccheader=b.cccheader) '+
+			'where a.cccheader=' + CCCHEADER.CCCHEADER + ' '+
+			'and a.ccctablou=' + CCCTABLOURI.CCCTABLOU + ' '+
+			') aa '+
+			'left join (select a.deviz fincode, a.ccctablou, a.ccccircuit, a.denumire, b.cccliniicircuit '+
+			'from ccccircuit a '+
+			'left join cccliniicircuit b on (a.ccccircuit=b.ccccircuit and a.cccheader=b.cccheader) '+
+			'where a.cccheader=' + CCCHEADER.CCCHEADER + ' '+
+			'and a.ccctablou=' + CCCTABLOURI.CCCTABLOU + ') bb '+
+			'on (aa.denumire=bb.denumire and aa.ccccircuit=bb.ccccircuit) '+
+			'where aa.cccliniicircuit is null '+
+			')';
+		X.RUNSQL(query, null);
+		X.DBLocate(CCCHEADER.CCCHEADER);
+	}
 }
 
 function dispose(obj) {

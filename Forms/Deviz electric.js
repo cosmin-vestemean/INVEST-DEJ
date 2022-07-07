@@ -229,6 +229,8 @@ function ON_SALDOC_SERIES() {
         SALDOC.CCCSTATUS = 74;
     }
 
+    setEditors(series);
+
 }
 
 function ON_DELETE() {
@@ -532,7 +534,7 @@ function updateFL_1(ds) {
             ds.CCCMTRLGEN + ',' + ds.QTY1 + ',' +
             ds.PRJC + ',' + ds.CCCSPECIALITATESF + ',' + ds.CCCSF + ',' + ds.CCCCOLECTIESF + ',' + ds.CCCCLADIRE + ',' + ds.CCCPRIMARYSPACE + ',' +
             ds.CCCSECONDARYSPACE + ',' + ds.CCCINCAPERE + ',' + ds.CCCTABLOURI + ',' + ds.CCCCIRCUIT + ',' + ds.CCCSPECIALIZARE + ',' +
-            ds.CCCCOLECTIE + ',' + ds.CCCCAPITOL + ',' + ds.CCCGRUPALUCRARI + ',' + ds.CCCACTIVITATE + ',' + SALDOC.FINCODE +');';
+            ds.CCCCOLECTIE + ',' + ds.CCCCAPITOL + ',' + ds.CCCGRUPALUCRARI + ',' + ds.CCCACTIVITATE + ',' + "'" + SALDOC.FINCODE + "'" +');';
         ds.NEXT;
     }
 

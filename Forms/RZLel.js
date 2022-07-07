@@ -1788,3 +1788,7 @@ function ON_EDIT() {
 
     }
 }
+
+function ON_SALDOC_SERIES() {
+    setEditors(series);
+}

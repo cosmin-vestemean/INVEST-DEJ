@@ -1963,3 +1963,7 @@ function getIntervalsFromLine(PRSN, d1, d2) {
 		return intervals;
 	}
 }
+
+function ON_SALDOC_SERIES() {
+	setEditors(series);
+}

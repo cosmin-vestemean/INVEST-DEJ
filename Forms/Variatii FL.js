@@ -545,7 +545,12 @@ function EXECCOMMAND(cmd) {
         if (SALDOC.CCCHEADER) {
             var s = X.CREATEOBJFORM('CCCSCHELGEO[Form=schelgeo2]');
             s.DBLOCATE(SALDOC.CCCHEADER);
+            var h = s.FindTable('CCCHEADER');
+            h.Edit;
+            h.CCCINTTEMPVALUE = SALDOC.FINDOC;
+            h.DBPost;
             s.SHOWOBJFORM();
+            X.DBLOCATE(SALDOC.FINDOC);
         } else {
             X.WARNING('Nu gasesc schema electrica.\n(SALDOC.CCCHEADER=null)');
         }
@@ -993,4 +998,8 @@ function setDetails(ds) {
             }
         }
     }
+}
+
+function ON_SALDOC_SERIES() {
+    setEditors(series);
 }

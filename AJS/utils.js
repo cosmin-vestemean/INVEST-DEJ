@@ -349,9 +349,9 @@ function circuitsExistsInFl(schEl, fl, sursaCircuitArrOfObj, refreshList) {
     }
 
     function getSursaCircuitList(fl) {
-        var q = 'select distinct a.ccctablouri, a.ccccircuit, c.deviz from mtrlines a ' +
+        var q = 'select distinct a.ccctablouri, a.CCCCIRCUIT, c.deviz from mtrlines a ' +
             'inner join findoc b on (a.findoc=b.findoc) ' +
-            'left join ccccircuit c on (c.ccccircuit=a.ccccircuit) ' +
+            'left join CCCCIRCUIT c on (c.CCCCIRCUIT=a.CCCCIRCUIT) ' +
             'where b.findoc=' + fl;
 
         return X.GETSQLDATASET(q, null);
@@ -545,4 +545,86 @@ function getDetailsForGeneric(schEl, sursa, circuit, mtrlGen) {
     return X.GETSQLDATASET(q, null);
 }
 
-//test git
+/*
+    * Acest comentariu a fost creat pentru Copilot:
+    * Functie generica extragere dataset din baza de date si prelucrarea datelor
+var query = "SELECT FINDOC, SERIES, TRDR, SUMAMNT FROM FINDOC WHERE COMPANY=:1 AND TFPRMS=201 AND FISCPRD=:2 AND PERIOD=:3";
+or 
+var query = "SELECT FINDOC, SERIES, TRDR, SUMAMNT FROM FINDOC WHERE COMPANY=:X.SYS.COMPANY AND TFPRMS=201 AND FISCPRD="+var2+" AND PERIOD="+var3;
+var ds = X.GETSQLDATASET(query, X.SYS.COMPANY, var2, var3);
+or 
+var ds = X.GETSQLDATASET(query, null);
+ds.FIRST;
+while (!ds.EOF) {
+    var vFindoc = ds.FINDOC;
+    var vSeries = ds.SERIES;
+    etc.
+    ds.NEXT;
+}
+Me: Copilot, do you got it?
+Copilot: Yes, I got it.
+*/
+
+//call it like this: adaugaConsumatoriSelectati('dsConsumatori', 'CCCLINIICIRCUIT')
+function adaugaConsumatoriSelectati(gridName, idLinie, datasetToAddTo) {
+    //adauga consumator(i) selectat din schema electrica
+    var enumLinii = getSelectedFromGrid(gridName, idLinie);
+    if (!enumLinii.length)
+        return;
+    //var enumCircuite = getSelectedFromGrid('dgCircuite', 'CCCCIRCUIT');
+    //var enumSurse = getSelectedFromGrid('dgSurse1', 'CCCTABLOU');
+
+    //extract (sursa, circuit, consumator) from db table cccliniicircuit and insert into grid ITELINES
+    //the relationship between parties are:
+    //consumatori (CCCCONSUMATOR) -> linii (CCCLINIICIRCUIT) -> circuit (CCCCIRCUIT) -> surse (CCCTABLOURI):
+    //SELECT * FROM CCCLINIICIRCUIT A INNER JOIN CCCCIRCUIT B ON A.CCCCIRCUIT = B.CCCCIRCUIT
+    //INNER JOIN CCCTABLOURI C ON B.CCCTABLOU = C.CCCTABLOU
+    //INNER JOIN CCCCONSUMATOR D ON C.CCCCONSUMATOR = A.CCCCONSUMATOR
+    var query = 'select D.CCCMTRLGEN, A.CCCCIRCUIT, C.CCCTABLOU from CCCLINIICIRCUIT A ' +
+        'inner join CCCCIRCUIT B on A.CCCCIRCUIT = B.CCCCIRCUIT ' +
+        'inner join CCCTABLOURI C on B.CCCTABLOU = C.CCCTABLOU ' +
+        'inner join CCCCONSUMATOR D on D.CCCCONSUMATOR = A.CCCCONSUMATOR ' +
+        'where A.CCCLINIICIRCUIT in (' + enumLinii + ')';
+    var ds = X.GETSQLDATASET(query, null);
+    if (!ds.RECORDCOUNT)
+        return;
+    else datasetToAddTo.Edit;
+    ds.FIRST;
+    while (!ds.EOF) {
+        datasetToAddTo.APPEND;
+        datasetToAddTo.MTRL = ds.CCCMTRLGEN; //MTRL is first  to add to grid
+        datasetToAddTo.CCCTABLOURI = ds.CCCTABLOU; //CCCTABLOU is second to add to grid
+        datasetToAddTo.CCCCIRCUIT = ds.CCCCIRCUIT; //CCCCIRCUIT is third to add to grid
+        datasetToAddTo.CCCMTRLGEN = ds.CCCMTRLGEN; //CCCMTRLGEN is fourth to add to grid
+        datasetToAddTo.POST; //post the record to the grid
+        ds.NEXT;
+    }
+}
+
+//call it like this: adaugaCircuiteSelectate('dgCircuite', 'CCCCIRCUIT') {
+function adaugaCircuiteSelectate(gridName, idCircuit, datasetToAddTo) {
+    //adauga circuite selectate din schema electrica
+    var enumCircuite = getSelectedFromGrid(gridName, idCircuit);
+    if (!enumCircuite.length)
+        return;
+    //for each circuit selected from grid dgCircuite loop through db table CCCLINIICIRCUIT and insert into grid ITELINES
+    var query = 'select D.CCCMTRLGEN, A.CCCCIRCUIT, C.CCCTABLOU from CCCLINIICIRCUIT A ' +
+        'inner join CCCCIRCUIT B on A.CCCCIRCUIT = B.CCCCIRCUIT ' +
+        'inner join CCCTABLOURI C on B.CCCTABLOU = C.CCCTABLOU ' +
+        'inner join CCCCONSUMATOR D on D.CCCCONSUMATOR = A.CCCCONSUMATOR ' +
+        'where A.CCCCIRCUIT in (' + enumCircuite + ')';
+    var ds = X.GETSQLDATASET(query, null);
+    if (!ds.RECORDCOUNT)
+        return;
+    else datasetToAddTo.Edit;
+    ds.FIRST;
+    while (!ds.EOF) {
+        datasetToAddTo.APPEND;
+        datasetToAddTo.MTRL = ds.CCCMTRLGEN; //MTRL is first  to add to grid
+        datasetToAddTo.CCCTABLOURI = ds.CCCTABLOU; //CCCTABLOU is second to add to grid
+        datasetToAddTo.CCCCIRCUIT = ds.CCCCIRCUIT; //CCCCIRCUIT is third to add to grid
+        datasetToAddTo.CCCMTRLGEN = ds.CCCMTRLGEN; //CCCMTRLGEN is fourth to add to grid
+        datasetToAddTo.POST; //post the record to the grid
+        ds.NEXT;
+    }
+}

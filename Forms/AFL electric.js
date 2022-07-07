@@ -137,12 +137,12 @@ function actual(ds, strDs, vFINCODE) {
                 nrLin++;
             }
 
-            if (ds.CCCMTRLGEN)
-                s.CCCMTRLGEN = ds.CCCMTRLGEN;
             if (ds.CCCTABLOURI)
                 s.CCCTABLOURI = ds.CCCTABLOURI;
             if (CCCCIRCUIT)
                 s.CCCCIRCUIT = ds.CCCCIRCUIT;
+            if (ds.CCCMTRLGEN)
+                s.CCCMTRLGEN = ds.CCCMTRLGEN;
             if (ds.CCCCLADIRE)
                 s.CCCCLADIRE = ds.CCCCLADIRE;
             if (ds.CCCPRIMARYSPACE)
@@ -490,6 +490,10 @@ function ON_INSERT() {
         SALDOC.SERIES = 4077;
     else if (X.LIST == 'AFLM electric')
         SALDOC.SERIES = 4078
+}
+
+function ON_SALDOC_SERIES () {
+    setEditors(series);
 }
 
 function ON_DELETE() {
