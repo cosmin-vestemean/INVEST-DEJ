@@ -628,3 +628,47 @@ function adaugaCircuiteSelectate(gridName, idCircuit, datasetToAddTo) {
         ds.NEXT;
     }
 }
+
+//call it like this: getStocTotalResponsabil(SALDOC.CCCMAGAZIONER, ITELINES, [ITELINES.CCCQTY1DEVIZ])
+function getStocTotalResponsabil(reponsabilMarfa, dsDestinatie, dsFieldDestinatie) {
+    if (!reponsabilMarfa) {
+        X.WARNING('Alegeti responsabil marfa...');
+    }
+    /*
+    var q = 'select b.MTRL, isnull(sum(isnull(b.qty1, 0)), 0) QTY1 from findoc a inner join cccoriginim b on (a.findoc=b.findoc) ' +
+        'where a.sosource=1151 and a.fprms=2015 and a.series=2015 and a.CCCMAGAZIONER=' + ITEDOC.CCCMAGAZIONER +
+        ' and b.prjc=' + ITEDOC.PRJC + ' and isnull(b.FINDOCS, 0) <> 0 group by b.mtrl having isnull(sum(isnull(b.qty1, 0)), 0) > 0';
+    */
+
+    var q = "select ml.MTRL, ml.QTY1 from findoc f inner join mtrlines ml on (f.findoc=ml.findoc) " +
+        "where f.sosource=1151 and f.fprms=2015 and f.series=2015 and f.CCCMAGAZIONER=" + reponsabilMarfa +
+        " and isnull(qty1, 0) > 0";
+
+    var ds = X.GETSQLDATASET(q, null);
+
+    if (ds.RECORDCOUNT > 0) {
+        X.WARNING(dsDestinatie.STATE);
+        if (!dsDestinatie.ACTIVE)
+            dsDestinatie.EDIT;
+        dsDestinatie.FIRST;
+        while (!dsDestinatie.EOF) {
+            if (dsDestinatie[dsFieldDestinatie] != 0)
+                dsDestinatie.DELETE;
+            else
+                dsDestinatie.NEXT;
+        }
+        ds.FIRST;
+        while (!ds.EOF) {
+            if (dsDestinatie.LOCATE('MTRL', ds.MTRL) == 1) {
+                dsDestinatie[dsFieldDestinatie] = ds.QTY1;
+            } else {
+                dsDestinatie.APPEND;
+                dsDestinatie.MTRL = ds.MTRL;
+                dsDestinatie[dsFieldDestinatie] = ds.QTY1;
+                dsDestinatie.QTY1 = 0;
+            }
+            dsDestinatie.POST;
+            ds.NEXT;
+        }
+    }
+}

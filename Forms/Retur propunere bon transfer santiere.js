@@ -1,3 +1,5 @@
+lib.include('utils');
+
 function ON_ITEDOC_PRJC() {
     if (ITEDOC.SERIES == 2011) {
         sSQL = 'select trdr, trdbranch,cccwhouse,CCCWHOUSESEC from prjc where prjc= ' + ITEDOC.PRJC;
@@ -59,7 +61,8 @@ function callStocuri() {
     }
 
     stocProiect();
-    stocResponsabil();
+    debugger;
+    getStocTotalResponsabil(ITEDOC.CCCMAGAZIONER, ITELINES, 'CCCQTY1DEVIZ');
 
     X.WARNING('Actualizare completa.');
 }
@@ -190,39 +193,6 @@ function EXECCOMMAND(cmd) {
     }
 }
 
-function stocResponsabil() {
-    if (!ITEDOC.CCCMAGAZIONER) {
-        X.WARNING('Alegeti responsabil marfa...');
-    }
-    var q = 'select b.MTRL, isnull(sum(isnull(b.qty1, 0)), 0) QTY1 from findoc a inner join cccoriginim b on (a.findoc=b.findoc) ' +
-        'where a.sosource=1151 and a.fprms=2015 and a.series=2015 and a.CCCMAGAZIONER=' + ITEDOC.CCCMAGAZIONER +
-        ' and b.prjc=' + ITEDOC.PRJC + ' group by b.mtrl having isnull(sum(isnull(b.qty1, 0)), 0) > 0';
-
-    var ds = X.GETSQLDATASET(q, null);
-    if (ds.RECORDCOUNT > 0) {
-        ITELINES.FIRST;
-        while (!ITELINES.EOF) {
-            if (ITELINES.CCCQTY1DEVIZ != 0)
-                ITELINES.DELETE;
-            else
-                ITELINES.NEXT;
-        }
-        ds.FIRST;
-        while (!ds.EOF) {
-            if (ITELINES.LOCATE('MTRL', ds.MTRL) == 1) {
-                ITELINES.CCCQTY1DEVIZ = ds.QTY1;
-            } else {
-                ITELINES.APPEND;
-                ITELINES.MTRL = ds.MTRL;
-                ITELINES.CCCQTY1DEVIZ = ds.QTY1;
-                ITELINES.QTY1 = 0;
-            }
-            ITELINES.POST;
-            ds.NEXT;
-        }
-    }
-}
-
 var itsMe = false;
 
 function ON_ITELINES_QTY1() {
@@ -230,7 +200,7 @@ function ON_ITELINES_QTY1() {
         itsMe = false;
         return;
     }
-    if (!ITELINES.QTY1)
+    if (ITELINES.QTY1 == 0)
         return;
     var mi = (!ITELINES.CCCSTOCWH || !ITELINES.CCCQTY1DEVIZ) ? 0 : Math.min(ITELINES.CCCSTOCWH, ITELINES.CCCQTY1DEVIZ);
     if (!mi) {

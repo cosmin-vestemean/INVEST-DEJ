@@ -194,21 +194,21 @@ function EXECCOMMAND(cmd) {
 	}
 
 	if (cmd == 20220706) {
-		var query = 'delete from ccccircuit where ccccircuit in (select aa.ccccircuit from '+
-			'( '+
-			'select a.deviz, a.ccctablou, a.ccccircuit, a.denumire, b.cccliniicircuit '+
-			'from ccccircuit a '+
-			'left join cccliniicircuit b on (a.ccccircuit=b.ccccircuit and a.cccheader=b.cccheader) '+
-			'where a.cccheader=' + CCCHEADER.CCCHEADER + ' '+
-			'and a.ccctablou=' + CCCTABLOURI.CCCTABLOU + ' '+
-			') aa '+
-			'left join (select a.deviz fincode, a.ccctablou, a.ccccircuit, a.denumire, b.cccliniicircuit '+
-			'from ccccircuit a '+
-			'left join cccliniicircuit b on (a.ccccircuit=b.ccccircuit and a.cccheader=b.cccheader) '+
-			'where a.cccheader=' + CCCHEADER.CCCHEADER + ' '+
-			'and a.ccctablou=' + CCCTABLOURI.CCCTABLOU + ') bb '+
-			'on (aa.denumire=bb.denumire and aa.ccccircuit=bb.ccccircuit) '+
-			'where aa.cccliniicircuit is null '+
+		var query = 'delete from ccccircuit where ccccircuit in (select aa.ccccircuit from ' +
+			'( ' +
+			'select a.deviz, a.ccctablou, a.ccccircuit, a.denumire, b.cccliniicircuit ' +
+			'from ccccircuit a ' +
+			'left join cccliniicircuit b on (a.ccccircuit=b.ccccircuit and a.cccheader=b.cccheader) ' +
+			'where a.cccheader=' + CCCHEADER.CCCHEADER + ' ' +
+			'and a.ccctablou=' + CCCTABLOURI.CCCTABLOU + ' ' +
+			') aa ' +
+			'left join (select a.deviz fincode, a.ccctablou, a.ccccircuit, a.denumire, b.cccliniicircuit ' +
+			'from ccccircuit a ' +
+			'left join cccliniicircuit b on (a.ccccircuit=b.ccccircuit and a.cccheader=b.cccheader) ' +
+			'where a.cccheader=' + CCCHEADER.CCCHEADER + ' ' +
+			'and a.ccctablou=' + CCCTABLOURI.CCCTABLOU + ') bb ' +
+			'on (aa.denumire=bb.denumire and aa.ccccircuit=bb.ccccircuit) ' +
+			'where aa.cccliniicircuit is null ' +
 			')';
 		X.RUNSQL(query, null);
 		X.DBLocate(CCCHEADER.CCCHEADER);
@@ -1009,6 +1009,17 @@ function createDefaultGenerics() {
 function ON_POST() {
 	createDefaultGenerics();
 	creareComboMaterialMarunt('MATERIAL MARUNT');
+	protectieDublare();
+}
+
+function protectieDublare() {
+	if (CCCHEADER.CCCHEADER < 0 && CCCHEADER.PRJC) {
+		var se = X.SQL("select coalesce(denumire, '')from cccheader where prjc = " + CCCHEADER.PRJC, null);
+		if (se) {
+			X.WARNING('Mai exista o schema electrica: ' + se + '\nLa re vedere');
+			X.CANCELEDITS;
+		}
+	}
 }
 
 function ON_AFTERPOST() {
@@ -1348,7 +1359,7 @@ function ON_CCCCONSUMATOR_DENUMIRE() {
 
 function consumatorExistent(l, str) {
 	for (var i = 0; i < l.length; i++) {
-		if (l[i].denumire.toLowerCase().trim() == str.toLowerCase().trim() ) {
+		if (l[i].denumire.toLowerCase().trim() == str.toLowerCase().trim()) {
 			return true;
 		}
 	}
@@ -1522,12 +1533,7 @@ function ON_CCCHEADER_PRJC() {
 		CCCARTGEN.NEXT;
 	}
 
-	if (CCCHEADER.CCCHEADER < 0 && CCCHEADER.PRJC) {
-		var se = X.SQL(" select coalesce(denumire, '')from cccheader where prjc = " + CCCHEADER.PRJC, null);
-		if (se) {
-			X.EXCEPTION('Mai exista o schema electrica: ' + se + '\nLa re vedere');
-		}
-	}
+	protectieDublare();
 }
 
 function ON_DELETE() {
