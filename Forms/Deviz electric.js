@@ -229,7 +229,7 @@ function ON_SALDOC_SERIES() {
         SALDOC.CCCSTATUS = 74;
     }
 
-    setEditors(series);
+    setEditors(SALDOC.SERIES);
 
 }
 

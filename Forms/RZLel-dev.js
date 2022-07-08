@@ -850,57 +850,58 @@ function createPBC1() {
 			tHeader.INT01 = ITELINES.CCCCIRCUIT;
 
 		//debugger;
+		var strMsg = '';
 		ITELINES.FIRST;
 		while (!ITELINES.EOF) {
 			if (ITELINES.QTY1 > 0) {
 				//daca nu a mai fost convertit
-				if (ITELINES.QTY1 + ITELINES.CCCTOTBCV <= ITELINES.CCCQTYFL && !ITELINES.BOOL01) {
-					tLinii.Append;
-					tLinii.MTRL = ITELINES.MTRL;
-					tLinii.MTRUNIT = ITELINES.MTRUNIT;
-					tLinii.CCCQTYFL = ITELINES.CCCQTYFL;
-					if (SALDOC.CCCMAGAZIONER)
-						tHeader.CCCMAGAZIONER = SALDOC.CCCMAGAZIONER;
-					tLinii.QTY1 = ITELINES.QTY1;
-					tLinii.CCCTOTBCV = ITELINES.CCCTOTBCV;
-					tLinii.FINDOCS = SALDOC.FINDOC;
-					if (ITELINES.CCCCLADIRE)
-						tLinii.CCCCLADIRE = ITELINES.CCCCLADIRE;
-					if (ITELINES.CCCPRIMARYSPACE)
-						tLinii.CCCPRIMARYSPACE = ITELINES.CCCPRIMARYSPACE;
-					if (ITELINES.CCCSECONDARYSPACE)
-						tLinii.CCCSECONDARYSPACE = ITELINES.CCCSECONDARYSPACE;
-					if (ITELINES.CCCINCAPERE)
-						tLinii.CCCINCAPERE = ITELINES.CCCINCAPERE;
-					if (ITELINES.CCCSPECIALITATESF)
-						tLinii.CCCSPECIALITATESF = ITELINES.CCCSPECIALITATESF;
-					if (ITELINES.CCCSF)
-						tLinii.CCCSF = ITELINES.CCCSF;
-					if (ITELINES.CCCCOLECTIESF)
-						tLinii.CCCCOLECTIESF = ITELINES.CCCCOLECTIESF;
-					if (ITELINES.CCCTABLOURI)
-						tLinii.CCCTABLOURI = ITELINES.CCCTABLOURI;
-					if (ITELINES.CCCCIRCUIT)
-						tLinii.CCCCIRCUIT = ITELINES.CCCCIRCUIT;
-					if (ITELINES.CCCMTRLGEN)
-						tLinii.CCCMTRLGEN = ITELINES.CCCMTRLGEN;
-					tLinii.Post;
-					ITELINES.EDIT;
-					//X.RUNSQL('update mtrlines set bool01 = 1 where findoc='+SALDOC.FINDOC+' and mtrlines='+ITELINES.MTRLINES, null); //semnalizez conversia liniei
-					ITELINES.BOOL01 = 1;
-					ITELINES.POST;
-					mtrlin.push(ITELINES.MTRLINES);
-				} else {
-					if (ITELINES.BOOL01) {
-						//convertit deja
-					} else
-					if (ITELINES.QTY1 + ITELINES.CCCTOTBCV <= ITELINES.CCCQTYFL) {
-						X.WARNING(ITELINES.MTRL_ITEM_NAME + ' depaseste cantitatea din FL.');
-					}
-				}
-			}
-			ITELINES.NEXT;
-		}
+				if (!ITELINES.BOOL01) {
+                    tLinii.Append;
+                    tLinii.MTRL = ITELINES.MTRL;
+                    tLinii.MTRUNIT = ITELINES.MTRUNIT;
+                    tLinii.CCCQTYFL = ITELINES.CCCQTYFL;
+                    if (SALDOC.CCCMAGAZIONER)
+                        tHeader.CCCMAGAZIONER = SALDOC.CCCMAGAZIONER;
+                    tLinii.QTY1 = ITELINES.QTY1;
+                    tLinii.CCCTOTBCV = ITELINES.CCCTOTBCV;
+                    tLinii.FINDOCS = SALDOC.FINDOC;
+                    if (ITELINES.CCCCLADIRE)
+                        tLinii.CCCCLADIRE = ITELINES.CCCCLADIRE;
+                    if (ITELINES.CCCPRIMARYSPACE)
+                        tLinii.CCCPRIMARYSPACE = ITELINES.CCCPRIMARYSPACE;
+                    if (ITELINES.CCCSECONDARYSPACE)
+                        tLinii.CCCSECONDARYSPACE = ITELINES.CCCSECONDARYSPACE;
+                    if (ITELINES.CCCINCAPERE)
+                        tLinii.CCCINCAPERE = ITELINES.CCCINCAPERE;
+                    if (ITELINES.CCCSPECIALITATESF)
+                        tLinii.CCCSPECIALITATESF = ITELINES.CCCSPECIALITATESF;
+                    if (ITELINES.CCCSF)
+                        tLinii.CCCSF = ITELINES.CCCSF;
+                    if (ITELINES.CCCCOLECTIESF)
+                        tLinii.CCCCOLECTIESF = ITELINES.CCCCOLECTIESF;
+                    if (ITELINES.CCCTABLOURI)
+                        tLinii.CCCTABLOURI = ITELINES.CCCTABLOURI;
+                    if (ITELINES.CCCCIRCUIT)
+                        tLinii.CCCCIRCUIT = ITELINES.CCCCIRCUIT;
+                    if (ITELINES.CCCMTRLGEN)
+                        tLinii.CCCMTRLGEN = ITELINES.CCCMTRLGEN;
+                    tLinii.Post;
+                    ITELINES.EDIT;
+                    //X.RUNSQL('update mtrlines set bool01 = 1 where findoc='+SALDOC.FINDOC+' and mtrlines='+ITELINES.MTRLINES, null); //semnalizez conversia liniei
+                    ITELINES.BOOL01 = 1;
+                    ITELINES.POST;
+                    mtrlin.push(ITELINES.MTRLINES);
+                }
+            }
+            if (ITELINES.QTY1 + ITELINES.CCCTOTBCV > ITELINES.CCCQTYFL) {
+                strMsg += 'Articolul ' + ITELINES.MTRL_ITEM_NAME + ' are cantitatea mai mare decat cea asteptata.\n';
+            }
+            ITELINES.NEXT;
+        }
+
+        if (strMsg) {
+            X.WARNING(strMsg);
+        }
 
 		var id = bc.SHOWOBJFORM();
 		//debugger;
@@ -1965,5 +1966,5 @@ function getIntervalsFromLine(PRSN, d1, d2) {
 }
 
 function ON_SALDOC_SERIES() {
-	setEditors(series);
+	setEditors(SALDOC.SERIES);
 }

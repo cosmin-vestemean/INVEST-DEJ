@@ -821,11 +821,12 @@ function createPBC1() {
             tHeader.INT01 = ITELINES.CCCCIRCUIT;
 
         //debugger;
+        var strMsg = '';
         ITELINES.FIRST;
         while (!ITELINES.EOF) {
             if (ITELINES.QTY1 > 0) {
                 //daca nu a mai fost convertit
-                if (ITELINES.QTY1 + ITELINES.CCCTOTBCV <= ITELINES.CCCQTYFL && !ITELINES.BOOL01) {
+                if (!ITELINES.BOOL01) {
                     tLinii.Append;
                     tLinii.MTRL = ITELINES.MTRL;
                     tLinii.MTRUNIT = ITELINES.MTRUNIT;
@@ -861,16 +862,16 @@ function createPBC1() {
                     ITELINES.BOOL01 = 1;
                     ITELINES.POST;
                     mtrlin.push(ITELINES.MTRLINES);
-                } else {
-                    if (ITELINES.BOOL01) {
-                        //convertit deja
-                    } else
-                    if (ITELINES.QTY1 + ITELINES.CCCTOTBCV <= ITELINES.CCCQTYFL) {
-                        X.WARNING(ITELINES.MTRL_ITEM_NAME + ' depaseste cantitatea din FL.');
-                    }
                 }
             }
+            if (ITELINES.QTY1 + ITELINES.CCCTOTBCV > ITELINES.CCCQTYFL) {
+                strMsg += 'Articolul ' + ITELINES.MTRL_ITEM_NAME + ' are cantitatea mai mare decat cea asteptata.\n';
+            }
             ITELINES.NEXT;
+        }
+
+        if (strMsg) {
+            X.WARNING(strMsg);
         }
 
         var id = bc.SHOWOBJFORM();
@@ -1790,5 +1791,5 @@ function ON_EDIT() {
 }
 
 function ON_SALDOC_SERIES() {
-    setEditors(series);
+    setEditors(SALDOC.SERIES);
 }

@@ -1001,5 +1001,5 @@ function setDetails(ds) {
 }
 
 function ON_SALDOC_SERIES() {
-    setEditors(series);
+    setEditors(SALDOC.SERIES);
 }

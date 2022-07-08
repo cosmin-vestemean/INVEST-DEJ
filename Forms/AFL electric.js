@@ -493,7 +493,7 @@ function ON_INSERT() {
 }
 
 function ON_SALDOC_SERIES () {
-    setEditors(series);
+    setEditors(SALDOC.SERIES);
 }
 
 function ON_DELETE() {
